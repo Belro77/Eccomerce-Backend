@@ -8,7 +8,7 @@ dotenv.config();
 
 const app = express();
 
-// Middlewares
+// ✅ Middlewares
 app.use(cors());
 app.use(express.json());
 
@@ -26,26 +26,23 @@ interface ICartItem extends Document {
 // ✅ Esquema y modelo de Mongoose
 const cartItemSchema = new Schema<ICartItem>({
   userId: { type: String, required: true },
-  name: String,
+  name: { type: String, required: true },
   category: String,
   color: String,
-  quantity: Number,
-  price: Number,
+  quantity: { type: Number, required: true },
+  price: { type: Number, required: true },
   imageUrl: String,
 });
 
-const CartItem = mongoose.model<ICartItem>(
-  "CartItem",
-  cartItemSchema
-);
+const CartItem = mongoose.model<ICartItem>("CartItem", cartItemSchema);
 
 // ✅ Conexión MongoDB Atlas
-
 console.log("MONGO_URI:", process.env.MONGO_URI);
 
 mongoose
   .connect(process.env.MONGO_URI as string)
-
+  .then(() => console.log("✅ Conectado a MongoDB Atlas"))
+  .catch((err) => console.error("❌ Error de conexión:", err));
 
 // ✅ Endpoint raíz
 app.get("/", (_req: Request, res: Response) => {
@@ -59,9 +56,7 @@ app.get("/api/products", async (_req: Request, res: Response) => {
     res.json(products);
   } catch (error) {
     console.error("❌ Error al obtener productos:", error);
-    res.status(500).json({
-      message: "Error al obtener productos",
-    });
+    res.status(500).json({ message: "Error al obtener productos" });
   }
 });
 
@@ -69,16 +64,22 @@ app.get("/api/products", async (_req: Request, res: Response) => {
 app.post("/cart", async (req: Request, res: Response) => {
   try {
     const item = new CartItem(req.body);
-
     await item.save();
-
     res.status(201).json(item);
   } catch (error) {
     console.error("❌ Error al agregar producto:", error);
+    res.status(400).json({ message: "Error al agregar producto" });
+  }
+});
 
-    res.status(400).json({
-      message: "Error al agregar producto",
-    });
+// ✅ Obtener carrito por usuario
+app.get("/cart/:userId", async (req: Request, res: Response) => {
+  try {
+    const items = await CartItem.find({ userId: req.params.userId });
+    res.json(items);
+  } catch (error) {
+    console.error("❌ Error al obtener carrito:", error);
+    res.status(500).json({ message: "Error al obtener carrito" });
   }
 });
 
@@ -86,14 +87,10 @@ app.post("/cart", async (req: Request, res: Response) => {
 app.delete("/cart/:id", async (req: Request, res: Response) => {
   try {
     await CartItem.findByIdAndDelete(req.params.id);
-
     res.status(204).end();
   } catch (error) {
     console.error("❌ Error al eliminar producto:", error);
-
-    res.status(400).json({
-      message: "Error al eliminar producto",
-    });
+    res.status(400).json({ message: "Error al eliminar producto" });
   }
 });
 
