@@ -6,12 +6,11 @@ import { Product } from "./models/product.model";
 
 dotenv.config();
 
-
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Interfaz (tipado para los items del carrito)
+// ✅ Interfaz para los items del carrito
 interface ICartItem extends Document {
   userId: string;
   name: string;
@@ -35,27 +34,25 @@ const cartItemSchema = new Schema<ICartItem>({
 
 const CartItem = mongoose.model<ICartItem>("CartItem", cartItemSchema);
 
-// ✅ Conexión a MongoDB Atlas
+// ✅ Conexión a MongoDB Atlas (solo variable de entorno)
 mongoose
-  .connect(
-    process.env.MONGO_URI ||
-      "mongodb+srv://<usuario>:<clave>@<cluster>.mongodb.net/tienda-ropa"
-  )
+  .connect(process.env.MONGO_URI as string)
   .then(() => console.log("✅ Conectado a MongoDB Atlas"))
   .catch((err) => console.error("❌ Error al conectar con MongoDB:", err));
 
-// ✅ Obtener carrito por usuario
-
-app.get('/api/products', async (req: Request, res: Response) => {
+// ✅ Endpoints
+// Obtener productos
+app.get("/api/products", async (_req: Request, res: Response) => {
   try {
     const products = await Product.find();
     res.json(products);
   } catch (error) {
-    console.error('Error al obtener productos:', error);
-    res.status(500).json({ message: 'Error al obtener productos' });
+    console.error("Error al obtener productos:", error);
+    res.status(500).json({ message: "Error al obtener productos" });
   }
 });
-// ✅ Agregar producto al carrito
+
+// Agregar producto al carrito
 app.post("/cart", async (req: Request, res: Response) => {
   try {
     const item = new CartItem(req.body);
@@ -67,7 +64,7 @@ app.post("/cart", async (req: Request, res: Response) => {
   }
 });
 
-// ✅ Eliminar producto por ID
+// Eliminar producto del carrito por ID
 app.delete("/cart/:id", async (req: Request, res: Response) => {
   try {
     await CartItem.findByIdAndDelete(req.params.id);
@@ -78,11 +75,9 @@ app.delete("/cart/:id", async (req: Request, res: Response) => {
   }
 });
 
-// ✅ Iniciar servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () =>
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`)
-);
-app.get("/", (_, res) => {
+// Endpoint raíz
+app.get("/", (_req, res) => {
   res.send("🚀 API de tienda zodiacal funcionando");
-}); 
+});
+
+// ✅ Iniciar
