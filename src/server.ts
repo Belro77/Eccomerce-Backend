@@ -40,12 +40,12 @@ const CartItem = mongoose.model<ICartItem>(
 );
 
 // ✅ Conexión MongoDB Atlas
+
+console.log("MONGO_URI:", process.env.MONGO_URI);
+
 mongoose
   .connect(process.env.MONGO_URI as string)
-  .then(() => console.log("✅ Conectado a MongoDB Atlas"))
-  .catch((err) =>
-    console.error("❌ Error al conectar con MongoDB:", err)
-  );
+
 
 // ✅ Endpoint raíz
 app.get("/", (_req: Request, res: Response) => {
