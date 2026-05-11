@@ -49,25 +49,10 @@ app.get("/", (_, res) => {
 });
 
 
-/* ✅ Productos
+//✅ Productos
 app.get("/api/products", async (_, res) => {
   try {
     const products = await Product.find();
-    res.json(products);
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      message: "Error al obtener productos",
-    });
-  }
-});*/
-app.get("/api/products", async (_, res) => {
-  try {
-    const products = await Product.find();
-
-    console.log(products);
-
     res.json(products);
   } catch (error) {
     console.error(error);
@@ -77,6 +62,7 @@ app.get("/api/products", async (_, res) => {
     });
   }
 });
+
 
 
 // ✅ Agregar carrito
