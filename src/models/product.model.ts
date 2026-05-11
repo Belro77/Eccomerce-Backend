@@ -11,4 +11,4 @@ const productSchema = new mongoose.Schema({
   description: String
 });
 
-export const Product = mongoose.model("Product", productSchema);
+export const Product = mongoose.model("Product", productSchema, "Productos");
