@@ -29,16 +29,19 @@ const cartItemSchema = new Schema({
 const CartItem = mongoose.model("CartItem", cartItemSchema);
 
 
-// ✅ Conexión MongoDB
 mongoose
   .connect(process.env.MONGO_URI as string)
   .then(() => {
     console.log("✅ Conectado a MongoDB Atlas");
-  })
-  .catch((err) => {
-    console.error("❌ Error de conexión:", err);
-  });
 
+    console.log("📦 DB:", mongoose.connection.db?.databaseName);
+    
+    console.log("📂 Collections:");
+    mongoose.connection.db
+      ?.listCollections()
+      .toArray()
+      .then((cols) => console.log(cols));
+  })
 
 // ✅ Ruta principal
 app.get("/", (_, res) => {
